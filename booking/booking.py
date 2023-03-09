@@ -1,24 +1,22 @@
 import os
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from .constants import url,email,password
 from selenium.webdriver.common.keys import Keys
-from datetime import date
 from time import sleep
 import pandas as pd
+from chromedriver_py import binary_path
 
 
 # Now we have to create a class which will inherit the webdriver class
 # We are doing this so that along with webdriver methods we can also create our custome methods and use them
 
 class Booking(webdriver.Chrome):
-    def __init__(self, driver_path=r"C:\Selenium Drivers", teardown=False):
-        self.driver_path = driver_path
+    def __init__(self, executable_path = binary_path, teardown=False):
+        self.executable_path = executable_path
+
         self.teardown = teardown
-        os.environ["PATH"] += self.driver_path
+        os.environ["PATH"] += self.executable_path
         # We want to instantiate the webdriver.Chrome class along the way so we use super
         super(Booking, self).__init__()
         self.implicitly_wait(15)
@@ -57,8 +55,6 @@ class Booking(webdriver.Chrome):
 
     def select_place_to_go(self):
         search_field = self.find_elements(By.CSS_SELECTOR, "#\:Ra9\:")[0]
-        # Before we enter anything in the iput field it is very imp to clear previous text
-        # search_field.clear()
         print("Enter the name of the place:")
         place = input()
         search_field.send_keys(place, Keys.ENTER)
@@ -66,6 +62,7 @@ class Booking(webdriver.Chrome):
     def get_hotels_info(self):
 
         ## Add the scroll functionality
+
         self.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
         scroll = 12
         sleep(2)
@@ -76,23 +73,13 @@ class Booking(webdriver.Chrome):
         ## Extracting hotel names
 
         hotel_names = self.find_elements(By.CSS_SELECTOR, ".fcab3ed991.a23c043802")
-        # prices = self.find_elements(By.CSS_SELECTOR, ".fd1924b122.d4741ba240")
+
         print(len(hotel_names))
-        # print(len(prices))
+
 
         for ele in hotel_names:
             self.dict["Hotel"].append(ele.text)
 
-        ## Extracting price of hotel
-
-
-        # print(prices)
-        #
-        # for ele in prices:
-        #
-        #     self.dict["Price"].append(ele.text)
-
-        ## Adding functionality to move on to the next page
         print(self.dict)
         print(len(self.dict["Hotel"]))
 
